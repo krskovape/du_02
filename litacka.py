@@ -1,8 +1,23 @@
-#tady bude funkce na otvírání dat...plus minus:
-#with open("neco.csv", encoding="utf-8") as csvfile:
+import csv
+from os import stat
+
+def open_file(file_name):
+    try:
+        with open(file_name, encoding="utf-8", newline = ',') as csvfile:
+            if stat(file_name).st_size == 0:
+                print("File is empty.")
+                quit()
+            return csv.DictReader(csvfile)
+    except FileNotFoundError:
+        print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
+        quit()
+    except PermissionError:
+        print(f"Program doesn't have permisson to access file {file_name}.")
+        quit()
 
 class Stops():
-    def __init__(self, data):
+    def __init__(self):
+        data = open_file("stops.txt")
         self.stop_id = data["stop_id"]
         self.stop_name = data["stop_name"]
         self.stop_lat = data["stop_lat"]
@@ -18,8 +33,9 @@ class Stops():
         self.asw_stop_id = data["asw_stop_id"]
 
 class StopTimes():
-    def __init__(self, data):
+    def __init__(self):
         #data = co nám vrátí funkce načítání z texťáku přes DictReader
+        data = open_file("stop_times.txt")
         self.trip_id = data["trip_id"]
         self.arrival_time = data["arrival_time"]
         self.departure_time = data["departure_time"]
@@ -33,7 +49,8 @@ class StopTimes():
         self.bikes_allowed = ["bikes_allowed"]
 
 class Trips ():
-    def __init__(self, data):
+    def __init__(self):
+        data = open_file("trips.txt")
         self.route_id = data["route_id"]
         self.service_id = data["service_id"]
         self.trip_id = data["trip_id"]
@@ -48,7 +65,8 @@ class Trips ():
     
 
 class Routes():
-    def __init__(self, data):
+    def __init__(self):
+        data = open_file("routes.txt")
         self.route_id = data["route_id"]
         self.agency_id = data["agency_id"]
         self.route_short_name = data["route_short_name"]
@@ -65,5 +83,20 @@ class StopSegment():
     def __init__(self):
         self.from_stop = None
         self.to_stop = None
-        self.trips = None
-        self.routes = None
+        self.trips = []
+        self.number_of_trips = 0
+        self.routes = []
+    
+    #vytvoření segmentu 
+    def create (self, from_stop, to_stop, trip_id, route_short_name):
+        self.from_stop = from_stop
+        self.to_stop = to_stop
+        self.trips.append(trip_id)
+        self.number_of_trips = 1
+        self.routes.append(route_short_name)
+    
+    def add (self, trip_id, route_short_name):
+        self.trips.append(trip_id)
+        self.number_of_trips += 1
+        if route_short_name not in self.routes:
+            self.routes.append(route_short_name)
