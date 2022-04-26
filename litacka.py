@@ -3,11 +3,11 @@ from os import stat
 
 def open_file(file_name):
     try:
-        with open(file_name, encoding="utf-8", newline = ',') as csvfile:
+        with open(file_name, encoding="utf-8", newline = '') as csvfile:
             if stat(file_name).st_size == 0:
                 print("File is empty.")
                 quit()
-            return csv.DictReader(csvfile)
+            return csv.DictReader(csvfile, delimiter = ',')
     except FileNotFoundError:
         print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
         quit()
@@ -34,7 +34,6 @@ class Stops():
 
 class StopTimes():
     def __init__(self):
-        #data = co nám vrátí funkce načítání z texťáku přes DictReader
         data = open_file("stop_times.txt")
         self.trip_id = data["trip_id"]
         self.arrival_time = data["arrival_time"]
@@ -43,12 +42,12 @@ class StopTimes():
         self.stop_sequence = data["stop_sequence"]
         self.stop_headsign = data["stop_headsign"]
         self.pickup_type = data["pickup_type"]
-        self.drop_off_type = ["drop_off_type"]
+        self.drop_off_type = data["drop_off_type"]
         self.shape_dist_traveled = data["shape_dist_traveled"]
-        self.trip_operation_type = ["trip_operation_type"]
-        self.bikes_allowed = ["bikes_allowed"]
+        self.trip_operation_type = data["trip_operation_type"]
+        self.bikes_allowed = data["bikes_allowed"]
 
-class Trips ():
+class Trips():
     def __init__(self):
         data = open_file("trips.txt")
         self.route_id = data["route_id"]
@@ -66,7 +65,34 @@ class Trips ():
 
 class Routes():
     def __init__(self):
-        data = open_file("routes.txt")
+        self.route_id = None
+        self.agency_id = None
+        self.route_short_name = None
+        self.route_long_name = None
+        self.route_type = None
+        self.route_url = None
+        self.route_color = None
+        self.route_text_color = None
+        self.is_night = None
+        self.is_regional = None
+        self.is_substitute_transport = None
+
+    # def load(self, file_name):
+    #     file = open_file(file_name)
+    #     for data in file:
+    #         self.route_id = data["route_id"]
+    #         self.agency_id = data["agency_id"]
+    #         self.route_short_name = data["route_short_name"]
+    #         self.route_long_name = data["route_long_name"]
+    #         self.route_type = data["route_type"]
+    #         self.route_url = data["route_url"]
+    #         self.route_color = data["route_color"]
+    #         self.route_text_color = data["route_text_color"]
+    #         self.is_night = data["is_night"]
+    #         self.is_regional = data["is_regional"]
+    #         self.is_substitute_transport = data["is_substitute_transport"]
+
+    def load(self, data):
         self.route_id = data["route_id"]
         self.agency_id = data["agency_id"]
         self.route_short_name = data["route_short_name"]
@@ -100,3 +126,10 @@ class StopSegment():
         self.number_of_trips += 1
         if route_short_name not in self.routes:
             self.routes.append(route_short_name)
+
+linky = Routes()
+linky_file = "D:\\Škůla\\PřF UK\\you'll never see me agaaaAAAIN\\6. semestr\\Programování II\\ukol2\\ukol_2\\routes.txt"
+linky_data = open_file(linky_file)
+for feature in linky_data:
+    linky.load(feature)
+print(linky)
