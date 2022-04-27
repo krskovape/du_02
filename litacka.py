@@ -7,7 +7,10 @@ def open_file(file_name):
             if stat(file_name).st_size == 0:
                 print("File is empty.")
                 quit()
-            return csv.DictReader(csvfile, delimiter = ',')
+            a = csv.DictReader(csvfile, delimiter = ',')
+            # for feature in a:
+            #     print(feature)
+            return a
     except FileNotFoundError:
         print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
         quit()
