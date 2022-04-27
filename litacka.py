@@ -15,6 +15,9 @@ def open_file(file_name):
         print(f"Program doesn't have permisson to access file {file_name}.")
         quit()
 
+# def open_file(file_name):
+#     return csv.DictReader(open(file_name))
+
 class Stops():
     def __init__(self):
         data = open_file("stops.txt")
@@ -77,21 +80,6 @@ class Routes():
         self.is_regional = None
         self.is_substitute_transport = None
 
-    # def load(self, file_name):
-    #     file = open_file(file_name)
-    #     for data in file:
-    #         self.route_id = data["route_id"]
-    #         self.agency_id = data["agency_id"]
-    #         self.route_short_name = data["route_short_name"]
-    #         self.route_long_name = data["route_long_name"]
-    #         self.route_type = data["route_type"]
-    #         self.route_url = data["route_url"]
-    #         self.route_color = data["route_color"]
-    #         self.route_text_color = data["route_text_color"]
-    #         self.is_night = data["is_night"]
-    #         self.is_regional = data["is_regional"]
-    #         self.is_substitute_transport = data["is_substitute_transport"]
-
     def load(self, data):
         self.route_id = data["route_id"]
         self.agency_id = data["agency_id"]
@@ -128,8 +116,11 @@ class StopSegment():
             self.routes.append(route_short_name)
 
 linky = Routes()
-linky_file = "D:\\Škůla\\PřF UK\\you'll never see me agaaaAAAIN\\6. semestr\\Programování II\\ukol2\\ukol_2\\routes.txt"
+#linky_file = "D:\\Škůla\\PřF UK\\you'll never see me agaaaAAAIN\\6. semestr\\Programování II\\ukol2\\ukol_2\\routes.txt"
+linky_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\routes.txt"
 linky_data = open_file(linky_file)
-for feature in linky_data:
-    linky.load(feature)
-print(linky)
+# for feature in linky_data:
+#     linky.load(feature)
+#print(linky_data)
+for item in linky_data:
+    print(item)
