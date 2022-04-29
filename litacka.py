@@ -84,10 +84,12 @@ class StopTimes():
                     print("File is empty.")
                     quit()
                 a = csv.DictReader(csvfile, delimiter = ',')
+                trip_indexy = []
                 for feature in a:
                     self.load(feature)
+                    trip_indexy.append(feature["trip_id"])
                     #print(feature)
-                return a
+                return trip_indexy
         except FileNotFoundError:
             print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
             quit()
@@ -208,9 +210,9 @@ class StopSegment():
         if route_short_name not in self.routes:
             self.routes.append(route_short_name)
 
-linky = Routes()
-linky_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\routes.txt"
-linky.open_file(linky_file)
+routes = Routes()
+routes_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\routes.txt"
+routes.open_file(routes_file)
 
 stops = Stops()
 stops_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\stops.txt"
@@ -218,10 +220,42 @@ stops.open_file(stops_file)
 
 stop_times = StopTimes()
 stop_times_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\stop_times.txt"
-stop_times.open_file(stop_times_file)
+trip_indexy = stop_times.open_file(stop_times_file)
 
 trips = Trips()
 trips_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\trips.txt"
 trips.open_file(trips_file)
 
 stop_segment = StopSegment()
+
+#vytváření mezizastávkových segmentů
+a = 0
+while a < len(trip_indexy)-1:
+    from_stop = 1
+    to_stop = 2
+    trip_idx = trip_indexy[a] #trip_id prvního objektu
+    segment_from = stop_times.stop_sequence
+
+    while trip_idx == stop_times.trip_id:
+        if stop_times.trip_id == trips.trip_id\
+            and trips.route_id == routes.route_id:
+            route = routes.route_short_name
+
+        # while from_stop != segment_from:
+        #     segment_from : StopTimes = segment_from.stop_sequence
+        if from_stop == stop_times.stop_sequence:
+            segment_from : StopTimes = stop_times.stop_sequence
+
+        if to_stop == stop_times.stop_sequence:
+            segment_to : StopTimes = stop_times.stop_sequence
+
+        if stop_segment.from_stop != segment_from.stop_id\
+            and stop_segment.to_stop != segment_to.stop_id:
+            stop_segment.create(segment_from.stop_id, segment_to.stop_id, trip_idx, route)
+        else:
+            stop_segment.add(trip_idx, route)
+
+        from_stop = to_stop
+        to_stop += 1
+
+    a += 1 #posunout se na další trip_id
