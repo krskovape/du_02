@@ -1,29 +1,23 @@
 import csv
 from os import stat
 
-def open_file(file_name):
-    try:
-        with open(file_name, encoding="utf-8", newline = '') as csvfile:
-            if stat(file_name).st_size == 0:
-                print("File is empty.")
-                quit()
-            a = csv.DictReader(csvfile, delimiter = ',')
-            # for feature in a:
-            #     print(feature)
-            return a
-    except FileNotFoundError:
-        print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
-        quit()
-    except PermissionError:
-        print(f"Program doesn't have permisson to access file {file_name}.")
-        quit()
-
-# def open_file(file_name):
-#     return csv.DictReader(open(file_name))
-
 class Stops():
     def __init__(self):
-        data = open_file("stops.txt")
+        self.stop_id = None
+        self.stop_name = None
+        self.stop_lat = None
+        self.stop_lon = None
+        self.zone_id = None
+        self.stop_url = None   
+        self.location_type = None  
+        self.parent_station = None
+        self.wheelchair_boarding = None
+        self.level_id = None
+        self.platform_code = None
+        self.asw_node_id = None
+        self.asw_stop_id = None
+    
+    def load(self, data):
         self.stop_id = data["stop_id"]
         self.stop_name = data["stop_name"]
         self.stop_lat = data["stop_lat"]
@@ -37,10 +31,40 @@ class Stops():
         self.platform_code = data["platform_code"]
         self.asw_node_id = data["asw_node_id"]
         self.asw_stop_id = data["asw_stop_id"]
+    
+    def open_file(self, file_name):
+        try:
+            with open(file_name, encoding="utf-8", newline = '') as csvfile:
+                if stat(file_name).st_size == 0:
+                    print("File is empty.")
+                    quit()
+                a = csv.DictReader(csvfile, delimiter = ',')
+                for feature in a:
+                    self.load(feature)
+                    #print(feature)
+                return a
+        except FileNotFoundError:
+            print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
+            quit()
+        except PermissionError:
+            print(f"Program doesn't have permisson to access file {file_name}.")
+            quit()
 
 class StopTimes():
     def __init__(self):
-        data = open_file("stop_times.txt")
+        self.trip_id = None
+        self.arrival_time = None
+        self.departure_time = None
+        self.stop_id = None
+        self.stop_sequence = None
+        self.stop_headsign = None
+        self.pickup_type = None
+        self.drop_off_type = None
+        self.shape_dist_traveled = None
+        self.trip_operation_type = None
+        self.bikes_allowed = None
+    
+    def load(self, data):
         self.trip_id = data["trip_id"]
         self.arrival_time = data["arrival_time"]
         self.departure_time = data["departure_time"]
@@ -53,9 +77,39 @@ class StopTimes():
         self.trip_operation_type = data["trip_operation_type"]
         self.bikes_allowed = data["bikes_allowed"]
 
+    def open_file(self, file_name):
+        try:
+            with open(file_name, encoding="utf-8", newline = '') as csvfile:
+                if stat(file_name).st_size == 0:
+                    print("File is empty.")
+                    quit()
+                a = csv.DictReader(csvfile, delimiter = ',')
+                for feature in a:
+                    self.load(feature)
+                    #print(feature)
+                return a
+        except FileNotFoundError:
+            print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
+            quit()
+        except PermissionError:
+            print(f"Program doesn't have permisson to access file {file_name}.")
+            quit()
+
 class Trips():
     def __init__(self):
-        data = open_file("trips.txt")
+        self.route_id = None
+        self.service_id = None
+        self.trip_id = None
+        self.trip_headsign = None
+        self.trip_short_name = None
+        self.direction_id = None
+        self.block_id = None
+        self.shape_id = None
+        self.wheelchair_accessible = None
+        self.bikes_allowed = None
+        self.exceptional = None
+    
+    def load(self, data):
         self.route_id = data["route_id"]
         self.service_id = data["service_id"]
         self.trip_id = data["trip_id"]
@@ -67,6 +121,24 @@ class Trips():
         self.wheelchair_accessible = data["wheelchair_accessible"]
         self.bikes_allowed = data["bikes_allowed"]
         self.exceptional = ["exceptional"]
+    
+    def open_file(self, file_name):
+        try:
+            with open(file_name, encoding="utf-8", newline = '') as csvfile:
+                if stat(file_name).st_size == 0:
+                    print("File is empty.")
+                    quit()
+                a = csv.DictReader(csvfile, delimiter = ',')
+                for feature in a:
+                    self.load(feature)
+                    #print(feature)
+                return a
+        except FileNotFoundError:
+            print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
+            quit()
+        except PermissionError:
+            print(f"Program doesn't have permisson to access file {file_name}.")
+            quit()
     
 
 class Routes():
@@ -95,6 +167,24 @@ class Routes():
         self.is_night = data["is_night"]
         self.is_regional = data["is_regional"]
         self.is_substitute_transport = data["is_substitute_transport"]
+    
+    def open_file(self, file_name):
+        try:
+            with open(file_name, encoding="utf-8", newline = '') as csvfile:
+                if stat(file_name).st_size == 0:
+                    print("File is empty.")
+                    quit()
+                a = csv.DictReader(csvfile, delimiter = ',')
+                for feature in a:
+                    self.load(feature)
+                    #print(feature)
+                return a
+        except FileNotFoundError:
+            print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
+            quit()
+        except PermissionError:
+            print(f"Program doesn't have permisson to access file {file_name}.")
+            quit()
 
 class StopSegment():
     def __init__(self):
@@ -119,11 +209,19 @@ class StopSegment():
             self.routes.append(route_short_name)
 
 linky = Routes()
-#linky_file = "D:\\Škůla\\PřF UK\\you'll never see me agaaaAAAIN\\6. semestr\\Programování II\\ukol2\\ukol_2\\routes.txt"
 linky_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\routes.txt"
-linky_data = open_file(linky_file)
-# for feature in linky_data:
-#     linky.load(feature)
-#print(linky_data)
-for item in linky_data:
-    print(item)
+linky.open_file(linky_file)
+
+stops = Stops()
+stops_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\stops.txt"
+stops.open_file(stops_file)
+
+stop_times = StopTimes()
+stop_times_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\stop_times.txt"
+stop_times.open_file(stop_times_file)
+
+trips = Trips()
+trips_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\trips.txt"
+trips.open_file(trips_file)
+
+stop_segment = StopSegment()
