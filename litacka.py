@@ -211,19 +211,19 @@ class StopSegment():
             self.routes.append(route_short_name)
 
 routes = Routes()
-routes_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\routes.txt"
+routes_file = "routes.txt"
 routes.open_file(routes_file)
 
 stops = Stops()
-stops_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\stops.txt"
+stops_file = "stops.txt"
 stops.open_file(stops_file)
 
 stop_times = StopTimes()
-stop_times_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\stop_times.txt"
+stop_times_file = "stop_times.txt"
 trip_indexy = stop_times.open_file(stop_times_file)
 
 trips = Trips()
-trips_file = "D:\\petak\\Documents\\škola\\2021_2022\\letňák\\Programovani_2\\cviceni\\ukol_druhy\\PID_GTFS\\trips.txt"
+trips_file = "trips.txt"
 trips.open_file(trips_file)
 
 stop_segment = StopSegment()
