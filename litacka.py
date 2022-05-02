@@ -1,7 +1,7 @@
 import csv
 from os import stat
 
-class Stops():
+class Stop():
     def __init__(self):
         self.stop_id = None
         self.stop_name = None
@@ -50,7 +50,7 @@ class Stops():
             print(f"Program doesn't have permisson to access file {file_name}.")
             quit()
 
-class StopTimes():
+class StopTime():
     def __init__(self):
         self.trip_id = None
         self.arrival_time = None
@@ -97,7 +97,7 @@ class StopTimes():
             print(f"Program doesn't have permisson to access file {file_name}.")
             quit()
 
-class Trips():
+class Trip():
     def __init__(self):
         self.route_id = None
         self.service_id = None
@@ -143,7 +143,7 @@ class Trips():
             quit()
     
 
-class Routes():
+class Route():
     def __init__(self):
         self.route_id = None
         self.agency_id = None
@@ -210,21 +210,21 @@ class StopSegment():
         if route_short_name not in self.routes:
             self.routes.append(route_short_name)
 
-routes = Routes()
-routes_file = "routes.txt"
-routes.open_file(routes_file)
+route = Route()
+route_file = "routes.txt"
+route.open_file(route_file)
 
-stops = Stops()
-stops_file = "stops.txt"
-stops.open_file(stops_file)
+stop = Stop()
+stop_file = "stops.txt"
+stop.open_file(stop_file)
 
-stop_times = StopTimes()
-stop_times_file = "stop_times.txt"
-trip_indexy = stop_times.open_file(stop_times_file)
+stop_time = StopTime()
+stop_time_file = "stop_times.txt"
+trip_indexy = stop_time.open_file(stop_time_file)
 
-trips = Trips()
-trips_file = "trips.txt"
-trips.open_file(trips_file)
+trip = Trip()
+trip_file = "trips.txt"
+trip.open_file(trip_file)
 
 stop_segment = StopSegment()
 
@@ -234,20 +234,20 @@ while a < len(trip_indexy)-1:
     from_stop = 1
     to_stop = 2
     trip_idx = trip_indexy[a] #trip_id prvního objektu
-    segment_from = stop_times.stop_sequence
+    segment_from = stop_time.stop_sequence
 
-    while trip_idx == stop_times.trip_id:
-        if stop_times.trip_id == trips.trip_id\
-            and trips.route_id == routes.route_id:
-            route = routes.route_short_name
+    while trip_idx == stop_time.trip_id:
+        if stop_time.trip_id == trip.trip_id\
+            and trip.route_id == route.route_id:
+            route = route.route_short_name
 
         # while from_stop != segment_from:
         #     segment_from : StopTimes = segment_from.stop_sequence
-        if from_stop == stop_times.stop_sequence:
-            segment_from : StopTimes = stop_times.stop_sequence
+        if from_stop == stop_time.stop_sequence:
+            segment_from : StopTime = stop_time.stop_sequence
 
-        if to_stop == stop_times.stop_sequence:
-            segment_to : StopTimes = stop_times.stop_sequence
+        if to_stop == stop_time.stop_sequence:
+            segment_to : StopTime = stop_time.stop_sequence
 
         if stop_segment.from_stop != segment_from.stop_id\
             and stop_segment.to_stop != segment_to.stop_id:
