@@ -1,50 +1,31 @@
-from cgitb import text
 import csv
 from datetime import time
 from os import stat
+from pyclbr import Class
 
-class Stop():
-    def __init__(self):
-        self.stop_id : str = None
-        self.stop_name : str = None
-        self.stop_lat : float = None
-        self.stop_lon : float = None
-        self.zone_id : str = None
-        self.stop_url : str = None   
-        self.location_type : int = None  
-        self.parent_station : str = None
-        self.wheelchair_boarding : int = None
-        self.level_id : str = None
-        self.platform_code : str = None
-        self.asw_node_id : int = None
-        self.asw_stop_id : int = None
-    
-    def load(self, data):
-        self.stop_id = data["stop_id"]
-        self.stop_name = data["stop_name"]
-        self.stop_lat = data["stop_lat"]
-        self.stop_lon = data["stop_lon"]
-        self.zone_id = data["zone_id"]
-        self.stop_url = data["stop_url"]   
-        self.location_type = data["location_type"]   
-        self.parent_station = data["parent_station"]
-        self.wheelchair_boarding = data["wheelchair_boarding"]
-        self.level_id = data["level_id"]
-        self.platform_code = data["platform_code"]
-        self.asw_node_id = data["asw_node_id"]
-        self.asw_stop_id = data["asw_stop_id"]
-    
-    def open_file(self, file_name):
+class GTFSTable():
+    def __init__(self) -> None:
+        pass
+
+    def load_file(self, file_name, class_name : Class):
         try:
             with open(file_name, encoding="utf-8", newline = '') as csvfile:
+                #empty file
                 if stat(file_name).st_size == 0:
                     print("File is empty.")
                     quit()
+                
                 a = csv.DictReader(csvfile, delimiter = ',')
+
+                list = []
+                dict1 = {}
+
+                #kvůli StopTime bych tady potřebovala předávat dva slovníky s odkazy na třídy, ale oby využiju jen tam!
                 for feature in a:
-                    self.load(feature)
-                    #print(feature)
-                return a
+                    class_name.add_element(feature, list, dict1)
+
+                return list, dict1
+
         except FileNotFoundError:
             print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
             quit()
@@ -52,145 +33,96 @@ class Stop():
             print(f"Program doesn't have permisson to access file {file_name}.")
             quit()
 
-class StopTime():
-    def __init__(self):
-        self.trip_id : str = None
-        self.arrival_time : time = None
-        self.departure_time : time = None
-        self.stop_id : str = None
-        self.stop_sequence : int = None
-        self.stop_headsign : str = None
-        self.pickup_type : int = None
-        self.drop_off_type : int = None
-        self.shape_dist_traveled : float = None
-        self.trip_operation_type : int = None
-        self.bikes_allowed : int = None
-    
-    def load(self, data):
-        self.trip_id = data["trip_id"]
-        self.arrival_time = data["arrival_time"]
-        self.departure_time = data["departure_time"]
-        self.stop_id = data["stop_id"]
-        self.stop_sequence = data["stop_sequence"]
-        self.stop_headsign = data["stop_headsign"]
-        self.pickup_type = data["pickup_type"]
-        self.drop_off_type = data["drop_off_type"]
-        self.shape_dist_traveled = data["shape_dist_traveled"]
-        self.trip_operation_type = data["trip_operation_type"]
-        self.bikes_allowed = data["bikes_allowed"]
+class Stop(GTFSTable):
+    def __init__(self, data):
+        self.stop_id : str = data["stop_id"]
+        self.stop_name : str = data["stop_name"]
+        self.stop_lat : float = data["stop_lat"]
+        self.stop_lon : float = data["stop_lon"]
+        self.zone_id : str = data["zone_id"]
+        self.stop_url : str = data["stop_url"]   
+        self.location_type : int = data["location_type"]  
+        self.parent_station : str = data["parent_station"]
+        self.wheelchair_boarding : int = data["wheelchair_boarding"]
+        self.level_id : str = data["level_id"]
+        self.platform_code : str = data["platform_code"]
+        self.asw_node_id : int = data["asw_node_id"]
+        self.asw_stop_id : int = data["asw_stop_id"]
 
-    def open_file(self, file_name):
-        try:
-            with open(file_name, encoding="utf-8", newline = '') as csvfile:
-                if stat(file_name).st_size == 0:
-                    print("File is empty.")
-                    quit()
-                a = csv.DictReader(csvfile, delimiter = ',')
-                trip_indexy = []
-                for feature in a:
-                    self.load(feature)
-                    trip_indexy.append(feature["trip_id"])
-                    #print(feature)
-                return trip_indexy
-        except FileNotFoundError:
-            print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
-            quit()
-        except PermissionError:
-            print(f"Program doesn't have permisson to access file {file_name}.")
-            quit()
-
-class Trip():
-    def __init__(self):
-        self.route_id : str = None
-        self.service_id : str = None
-        self.trip_id : str = None
-        self.trip_headsign : str = None
-        self.trip_short_name : str = None
-        self.direction_id : int = None
-        self.block_id : str = None
-        self.shape_id : str = None
-        self.wheelchair_accessible : int = None
-        self.bikes_allowed : int = None
-        self.exceptional : int = None
-    
-    def load(self, data):
-        self.route_id = data["route_id"]
-        self.service_id = data["service_id"]
-        self.trip_id = data["trip_id"]
-        self.trip_headsign = data["trip_headsign"]
-        self.trip_short_name = data["trip_short_name"]
-        self.direction_id = data["direction_id"]
-        self.block_id = data["block_id"]
-        self.shape_id = data["shape_id"]
-        self.wheelchair_accessible = data["wheelchair_accessible"]
-        self.bikes_allowed = data["bikes_allowed"]
-        self.exceptional = ["exceptional"]
-    
-    def open_file(self, file_name):
-        try:
-            with open(file_name, encoding="utf-8", newline = '') as csvfile:
-                if stat(file_name).st_size == 0:
-                    print("File is empty.")
-                    quit()
-                a = csv.DictReader(csvfile, delimiter = ',')
-                for feature in a:
-                    self.load(feature)
-                    #print(feature)
-                return a
-        except FileNotFoundError:
-            print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
-            quit()
-        except PermissionError:
-            print(f"Program doesn't have permisson to access file {file_name}.")
-            quit()
+    @classmethod
+    def add_element(cls, data, list_stops : list, dict_stops):
+        a = cls(data)
+        list_stops.append(a)
+        dict_stops[data["stop_id"]] = a
     
 
-class Route():
-    def __init__(self):
-        self.route_id : str = None
-        self.agency_id = None
-        self.route_short_name : str = None
-        self.route_long_name : str = None
-        self.route_type : int = None
-        self.route_url : str = None
-        self.route_color : str = None
-        self.route_text_color : str = None
-        self.is_night : int = None
-        self.is_regional : int = None
-        self.is_substitute_transport : int = None
 
-    def load(self, data):
-        self.route_id = data["route_id"]
+class StopTime(GTFSTable):
+    def __init__(self, data, dict_trips : dict, dict_stops : dict):
+        self.trip : Trip = dict_trips.get(data["trip_id"])
+        self.arrival_time : time = data["arrival_time"]
+        self.departure_time : time = data["departure_time"]
+        self.stop : Stop = dict_stops.get(data["stop_id"])
+        self.stop_sequence : int = data["stop_sequence"]
+        self.stop_headsign : str = data["stop_headsign"]
+        self.pickup_type : int = data["pickup_type"]
+        self.drop_off_type : int = data["drop_off_type"]
+        self.shape_dist_traveled : float = data["shape_dist_traveled"]
+        self.trip_operation_type : int = data["trip_operation_type"]
+        self.bikes_allowed : int = data["bikes_allowed"]
+    
+    @classmethod
+    def add_element(cls, data, list_stoptime : list, dict1 : dict, dict_trips, dict_stops):
+        a = cls(data, dict_trips, dict_stops)
+        list_stoptime.append(a)
+        dict1.clear()
+
+
+class Trip(GTFSTable):
+    def __init__(self, data, dict_routes : dict):
+        self.route : Route = dict_routes.get(data["route_id"])
+        self.service_id : str = data["service_id"]
+        self.trip_id : str = data["trip_id"]
+        self.trip_headsign : str = data["trip_headsign"]
+        self.trip_short_name : str = data["trip_short_name"]
+        self.direction_id : int = data["direction_id"]
+        self.block_id : str = data["block_id"]
+        self.shape_id : str = data["shape_id"]
+        self.wheelchair_accessible : int = data["wheelchair_accessible"]
+        self.bikes_allowed : int = data["bikes_allowed"]
+        self.exceptional : int = data["exceptional"]
+    
+    @classmethod
+    def add_element(cls, data, list_trips : list, dict_trips : dict, dict_routes : dict):
+        a = cls(data, dict_routes)
+        list_trips.append(a)
+        dict_trips[data["trip_id"]] = a
+    
+
+class Route(GTFSTable):
+    def __init__(self, data):
+        self.route_id : str = data["route_id"]
         self.agency_id = data["agency_id"]
-        self.route_short_name = data["route_short_name"]
-        self.route_long_name = data["route_long_name"]
-        self.route_type = data["route_type"]
-        self.route_url = data["route_url"]
-        self.route_color = data["route_color"]
-        self.route_text_color = data["route_text_color"]
-        self.is_night = data["is_night"]
-        self.is_regional = data["is_regional"]
-        self.is_substitute_transport = data["is_substitute_transport"]
+        self.route_short_name : str = data["route_short_name"]
+        self.route_long_name : str = data["route_long_name"]
+        self.route_type : int = data["route_type"]
+        self.route_url : str = data["route_url"]
+        self.route_color : str = data["route_color"]
+        self.route_text_color : str = data["route_text_color"]
+        self.is_night : int = data["is_night"]
+        self.is_regional : int = data["is_regional"]
+        self.is_substitute_transport : int = data["is_substitute_transport"]
     
-    def open_file(self, file_name):
-        try:
-            with open(file_name, encoding="utf-8", newline = '') as csvfile:
-                if stat(file_name).st_size == 0:
-                    print("File is empty.")
-                    quit()
-                a = csv.DictReader(csvfile, delimiter = ',')
-                for feature in a:
-                    self.load(feature)
-                    #print(feature)
-                return a
-        except FileNotFoundError:
-            print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
-            quit()
-        except PermissionError:
-            print(f"Program doesn't have permisson to access file {file_name}.")
-            quit()
+    @classmethod
+    def add_element(cls, data, list_routes : list, dict_routes : dict, dict_none: dict):
+        a = cls(data)
+        list_routes.append(a)
+        dict_routes[data["route_id"]] = a
+        dict_none.clear()
+    
+    
 
-class StopSegment():
+class StopSegment(GTFSTable):
     def __init__(self):
         self.from_stop = None
         self.to_stop = None
@@ -211,6 +143,7 @@ class StopSegment():
         self.number_of_trips += 1
         if route_short_name not in self.routes:
             self.routes.append(route_short_name)
+    
 
 route = Route()
 route_file = "routes.txt"
