@@ -1,21 +1,23 @@
+from cgitb import text
 import csv
+from datetime import time
 from os import stat
 
 class Stop():
     def __init__(self):
-        self.stop_id = None
-        self.stop_name = None
-        self.stop_lat = None
-        self.stop_lon = None
-        self.zone_id = None
-        self.stop_url = None   
-        self.location_type = None  
-        self.parent_station = None
-        self.wheelchair_boarding = None
-        self.level_id = None
-        self.platform_code = None
-        self.asw_node_id = None
-        self.asw_stop_id = None
+        self.stop_id : str = None
+        self.stop_name : str = None
+        self.stop_lat : float = None
+        self.stop_lon : float = None
+        self.zone_id : str = None
+        self.stop_url : str = None   
+        self.location_type : int = None  
+        self.parent_station : str = None
+        self.wheelchair_boarding : int = None
+        self.level_id : str = None
+        self.platform_code : str = None
+        self.asw_node_id : int = None
+        self.asw_stop_id : int = None
     
     def load(self, data):
         self.stop_id = data["stop_id"]
@@ -52,17 +54,17 @@ class Stop():
 
 class StopTime():
     def __init__(self):
-        self.trip_id = None
-        self.arrival_time = None
-        self.departure_time = None
-        self.stop_id = None
-        self.stop_sequence = None
-        self.stop_headsign = None
-        self.pickup_type = None
-        self.drop_off_type = None
-        self.shape_dist_traveled = None
-        self.trip_operation_type = None
-        self.bikes_allowed = None
+        self.trip_id : str = None
+        self.arrival_time : time = None
+        self.departure_time : time = None
+        self.stop_id : str = None
+        self.stop_sequence : int = None
+        self.stop_headsign : str = None
+        self.pickup_type : int = None
+        self.drop_off_type : int = None
+        self.shape_dist_traveled : float = None
+        self.trip_operation_type : int = None
+        self.bikes_allowed : int = None
     
     def load(self, data):
         self.trip_id = data["trip_id"]
@@ -99,17 +101,17 @@ class StopTime():
 
 class Trip():
     def __init__(self):
-        self.route_id = None
-        self.service_id = None
-        self.trip_id = None
-        self.trip_headsign = None
-        self.trip_short_name = None
-        self.direction_id = None
-        self.block_id = None
-        self.shape_id = None
-        self.wheelchair_accessible = None
-        self.bikes_allowed = None
-        self.exceptional = None
+        self.route_id : str = None
+        self.service_id : str = None
+        self.trip_id : str = None
+        self.trip_headsign : str = None
+        self.trip_short_name : str = None
+        self.direction_id : int = None
+        self.block_id : str = None
+        self.shape_id : str = None
+        self.wheelchair_accessible : int = None
+        self.bikes_allowed : int = None
+        self.exceptional : int = None
     
     def load(self, data):
         self.route_id = data["route_id"]
@@ -145,17 +147,17 @@ class Trip():
 
 class Route():
     def __init__(self):
-        self.route_id = None
+        self.route_id : str = None
         self.agency_id = None
-        self.route_short_name = None
-        self.route_long_name = None
-        self.route_type = None
-        self.route_url = None
-        self.route_color = None
-        self.route_text_color = None
-        self.is_night = None
-        self.is_regional = None
-        self.is_substitute_transport = None
+        self.route_short_name : str = None
+        self.route_long_name : str = None
+        self.route_type : int = None
+        self.route_url : str = None
+        self.route_color : str = None
+        self.route_text_color : str = None
+        self.is_night : int = None
+        self.is_regional : int = None
+        self.is_substitute_transport : int = None
 
     def load(self, data):
         self.route_id = data["route_id"]
