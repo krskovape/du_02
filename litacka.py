@@ -20,9 +20,8 @@ class GTFSTable():
                 list = []
 
                 #kvůli StopTime bych tady potřebovala předávat dva slovníky s odkazy na třídy, ale oby využiju jen tam!
-                if class_name == "Routes":
-                    for feature in a:
-                        class_name.add_element(feature, list, dict1, dict2)
+                for feature in a:
+                    class_name.add_element(feature, list, dict1, dict2)
 
                 return list, dict1
 
@@ -101,7 +100,18 @@ class Trip(GTFSTable):
 
 class Route(GTFSTable):
     def __init__(self):
-        pass
+        self.route_id = None
+        self.agency_id = None
+        self.route_short_name = None
+        self.route_long_name = None
+        self.route_type = None
+        self.route_url = None
+        self.route_color = None
+        self.route_text_color = None
+        self.is_night = None
+        self.is_regional = None
+        self.is_substitute_transport = None
+
     def insert(self, data):
         self.route_id : str = data["route_id"]
         self.agency_id = data["agency_id"]
@@ -117,7 +127,7 @@ class Route(GTFSTable):
     
     @classmethod
     def add_element(cls, data, list_routes : list, dict_routes : dict, dict_none: dict):
-        a = cls.insert(data)
+        a = cls.insert(cls, data)
         list_routes.append(a)
         dict_routes[data["route_id"]] = a
         dict_none.clear()
@@ -154,8 +164,9 @@ route = Route()
 route_file = "routes.txt"
 list_routes, dict_routes = gtfs.load_file(route_file, route , dict_routes, dict_none)
 
-print(list_routes)
-print(dict_routes)
+print(len(list_routes))
+#print(dict_routes)
+
 
 # stop = Stop()
 # stop_file = "stops.txt"
