@@ -13,8 +13,8 @@ def get_data(file_name):
         print(f"Program doesn't have permisson to access file {file_name}.")
         quit() 
     except zipfile.BadZipFile:
-        print(f"{file_name} is not a ZIP file.")
+        print(f"{file_name} file is not a ZIP file.")
         quit()
     except zipfile.LargeZipFile:
-        print(f"{file_name} would require ZIP64 functionality to be unzipped but that has not been enabled (yet).")
-
+        print(f"{file_name} file is too big for this program to unzipp it.")
+        quit()
