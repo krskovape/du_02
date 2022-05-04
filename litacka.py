@@ -1,13 +1,12 @@
 import csv
 from datetime import time
 from os import stat
-from pyclbr import Class
 
 class GTFSTable():
     def __init__(self) -> None:
         pass
 
-    def load_file(self, file_name, class_name : Class, dict1 : dict, dict2 : dict):
+    def load_file(self, file_name):
         try:
             with open(file_name, encoding="utf-8", newline = '') as csvfile:
                 #empty file
@@ -18,12 +17,9 @@ class GTFSTable():
                 a = csv.DictReader(csvfile, delimiter = ',')
 
                 list = []
-
-                #kvůli StopTime bych tady potřebovala předávat dva slovníky s odkazy na třídy, ale oby využiju jen tam!
                 for feature in a:
-                    class_name.add_element(feature, list, dict1, dict2)
-
-                return list, dict1
+                    list.append(feature)
+                return list
 
         except FileNotFoundError:
             print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
@@ -49,12 +45,15 @@ class Stop(GTFSTable):
         self.asw_stop_id : int = data["asw_stop_id"]
 
     @classmethod
-    def add_element(cls, data, list_stops : list, dict_stops, dict2 : dict):
-        a = cls(data)
-        list_stops.append(a)
-        dict_stops[data["stop_id"]] = a
-        dict2.clear()
-    
+    def add_element(cls, file_name):
+        list = cls.load_file(cls, file_name)
+        dict_stops = {}
+        list_stop = []
+        for b in list:
+            a = cls(b)
+            dict_stops[b["stop_id"]] = a
+            list_stop.append(a)
+        return list_stop, dict_stops
 
 
 class StopTime(GTFSTable):
@@ -72,9 +71,13 @@ class StopTime(GTFSTable):
         self.bikes_allowed : int = data["bikes_allowed"]
     
     @classmethod
-    def add_element(cls, data, list_stoptime : list, dict_trips, dict_stops):
-        a = cls(data, dict_trips, dict_stops)
-        list_stoptime.append(a)
+    def add_element(cls, file_name, dict_trips, dict_stops):
+        list = cls.load_file(cls, file_name)
+        list_stop_times = []
+        for b in list:
+            a = cls(b, dict_trips, dict_stops)
+            list_stop_times.append(a)
+        return list_stop_times
 
 
 class Trip(GTFSTable):
@@ -92,27 +95,19 @@ class Trip(GTFSTable):
         self.exceptional : int = data["exceptional"]
     
     @classmethod
-    def add_element(cls, data, list_trips : list, dict_trips : dict, dict_routes : dict):
-        a = cls(data, dict_routes)
-        list_trips.append(a)
-        dict_trips[data["trip_id"]] = a
+    def add_element(cls, file_name, dict_routes):
+        list = cls.load_file(cls, file_name)
+        dict_trips = {}
+        list_trips = []
+        for b in list:
+            a = cls(b, dict_routes)
+            dict_trips[b["trip_id"]] = a
+            list_trips.append(a)
+        return list_trips, dict_trips
     
 
 class Route(GTFSTable):
-    def __init__(self):
-        self.route_id = None
-        self.agency_id = None
-        self.route_short_name = None
-        self.route_long_name = None
-        self.route_type = None
-        self.route_url = None
-        self.route_color = None
-        self.route_text_color = None
-        self.is_night = None
-        self.is_regional = None
-        self.is_substitute_transport = None
-
-    def insert(self, data):
+    def __init__(self, data):
         self.route_id : str = data["route_id"]
         self.agency_id = data["agency_id"]
         self.route_short_name : str = data["route_short_name"]
@@ -126,11 +121,15 @@ class Route(GTFSTable):
         self.is_substitute_transport : int = data["is_substitute_transport"]
     
     @classmethod
-    def add_element(cls, data, list_routes : list, dict_routes : dict, dict_none: dict):
-        a = cls.insert(cls, data)
-        list_routes.append(a)
-        dict_routes[data["route_id"]] = a
-        dict_none.clear()
+    def add_element(cls, file_name):
+        list = cls.load_file(cls, file_name)
+        dict_routes = {}
+        list_routes = []
+        for b in list:
+            a = cls(b)
+            dict_routes[b["route_id"]] = a
+            list_routes.append(a)
+        return list_routes, dict_routes
     
     
 
@@ -156,29 +155,25 @@ class StopSegment(GTFSTable):
         if route_short_name not in self.routes:
             self.routes.append(route_short_name)
 
-gtfs = GTFSTable()    
-dict_routes = {}
-dict_none = {}
-#class_name = "Route"
-route = Route()
-route_file = "routes.txt"
-list_routes, dict_routes = gtfs.load_file(route_file, route , dict_routes, dict_none)
+stop_file = "stops.txt"
+list_stops, dict_stops = Stop.add_element(stop_file)
+#print(list_stops)
+print(len(list_stops))
 
+routes_file = "routes.txt"
+list_routes, dict_routes = Route.add_element(routes_file)
+#print(list_routes)
 print(len(list_routes))
-#print(dict_routes)
 
+trips_file = "trips.txt"
+list_trips, dict_trips = Trip.add_element(trips_file, dict_routes)
+#print(list_trips)
+print(len(list_trips))
 
-# stop = Stop()
-# stop_file = "stops.txt"
-# stop.open_file(stop_file)
-
-# stop_time = StopTime()
-# stop_time_file = "stop_times.txt"
-# trip_indexy = stop_time.open_file(stop_time_file)
-
-# trip = Trip()
-# trip_file = "trips.txt"
-# trip.open_file(trip_file)
+stop_times_file = "stop_times.txt"
+list_stop_times= StopTime.add_element(stop_times_file, dict_trips, dict_stops)
+#print(list_stop_times)
+print(len(list_stop_times))
 
 stop_segment = StopSegment()
 
