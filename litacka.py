@@ -2,6 +2,16 @@ import csv
 from datetime import time
 from os import stat
 
+download_data = input("Do you want to download and unzip data? (yes/no) ")
+
+if download_data == "yes":
+    import get_data
+    get_data.retrieve_data()
+elif download_data == "no":
+    pass
+else:
+    print("Wrong answear.", input("Try again! (yes/no) "))
+
 class GTFSTable():
     def __init__(self) -> None:
         pass
