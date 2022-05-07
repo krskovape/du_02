@@ -134,27 +134,12 @@ class Route(GTFSTable):
     
 
 class StopSegment(GTFSTable):
-    def __init__(self):
-        self.from_stop = None
-        self.to_stop = None
-        self.trips = []
-        self.number_of_trips = 0
-        self.routes = []
-    
-    #vytvoření segmentu 
-    def create (self, from_stop, to_stop, trip, route_short_name):
+    def __init__ (self, from_stop, to_stop, trip, route_short_name):
         self.from_stop = from_stop
         self.to_stop = to_stop
-        self.trips.append(trip)
+        self.trips : list = [trip]
         self.number_of_trips = 1
-        self.routes.append(route_short_name)
-        return self
-    
-    def add (self, trip, route_short_name):
-        self.trips.append(trip)
-        self.number_of_trips += 1
-        if route_short_name not in self.routes:
-            self.routes.append(route_short_name)
+        self.routes : list = [route_short_name]
 
 stop_file = "gtfs\\stops.txt"
 list_stops, dict_stops = Stop.add_element(stop_file)
@@ -176,8 +161,9 @@ list_stop_times= StopTime.add_element(stop_times_file, dict_trips, dict_stops)
 #print(list_stop_times)
 print(f"StopTimes: {len(list_stop_times)}")
 
-stop_segment = StopSegment()
-list_stop_segments = []
+#stop_segment = StopSegment()
+#list_stop_segments = []
+dict_stop_segments = {}
 
 i = 0
 j = 1
@@ -186,21 +172,22 @@ while j <= len(list_stop_times)-1:
     if list_stop_times[i].trip == list_stop_times[j].trip\
         and list_stop_times[i].stop_sequence < list_stop_times[j].stop_sequence:
 
-        if list_stop_times[i].stop == stop_segment.from_stop\
-            and list_stop_times[j].stop == stop_segment.to_stop:
-            stop_segment.add(list_stop_times[i].trip, list_stop_times[i].trip.route.route_short_name)
+        if (str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)) in dict_stop_segments:
+            dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].trips.append(list_stop_times[i].trip)
+            dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].number_of_trips += 1
+            dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].routes.append(list_stop_times[i].trip.route.route_short_name)
 
         else:
-            a = stop_segment.create(list_stop_times[i].stop, list_stop_times[j].stop, list_stop_times[i].trip,\
-                    list_stop_times[i].trip.route.route_short_name)
-            list_stop_segments.append(a)
+            dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)] = \
+                StopSegment(list_stop_times[i].stop, list_stop_times[j].stop, list_stop_times[i].trip, list_stop_times[i].trip.route.route_short_name)
     i += 1
     j += 1
 
 print("\n")
-#print(list_stop_segment)
-list_stop_segments.sort(key=lambda x: x.number_of_trips, reverse = True)
-print(list_stop_segments[0].number_of_trips)
-print(list_stop_segments[1].number_of_trips)
-print(list_stop_segments[2].number_of_trips)
-print(list_stop_segments[3].number_of_trips)
+
+#sorted(dict_stop_segments.items(), key= lambda x: x[x].number_of_trips)
+sorted(dict_stop_segments.items(), reverse= True)
+print(list(dict_stop_segments.values())[0].number_of_trips, list(dict_stop_segments.values())[0].from_stop.stop_name, list(dict_stop_segments.values())[0].to_stop.stop_name)
+print(list(dict_stop_segments.values())[1].number_of_trips, list(dict_stop_segments.values())[1].from_stop.stop_name, list(dict_stop_segments.values())[1].to_stop.stop_name)
+print(list(dict_stop_segments.values())[2].number_of_trips, list(dict_stop_segments.values())[2].from_stop.stop_name, list(dict_stop_segments.values())[2].to_stop.stop_name)
+print(list(dict_stop_segments.values())[3].number_of_trips, list(dict_stop_segments.values())[3].from_stop.stop_name, list(dict_stop_segments.values())[3].to_stop.stop_name)
