@@ -185,7 +185,8 @@ while j <= len(list_stop_times)-1:
         if (str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)) in dict_stop_segments:
             dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].trips.append(list_stop_times[i].trip)
             dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].number_of_trips += 1
-            dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].routes.append(list_stop_times[i].trip.route.route_short_name)
+            if list_stop_times[i].trip.route.route_short_name not in dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].routes:
+                dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].routes.append(list_stop_times[i].trip.route.route_short_name)
 
         else:
             dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)] = \
@@ -197,6 +198,7 @@ print("\n")
 
 #sorted(dict_stop_segments.items(), key= lambda x: x[x].number_of_trips)
 sorted(dict_stop_segments.items(), reverse= True)
+print(list(dict_stop_segments.values())[0].routes)
 print(list(dict_stop_segments.values())[0].number_of_trips, list(dict_stop_segments.values())[0].from_stop.stop_name, list(dict_stop_segments.values())[0].to_stop.stop_name)
 print(list(dict_stop_segments.values())[1].number_of_trips, list(dict_stop_segments.values())[1].from_stop.stop_name, list(dict_stop_segments.values())[1].to_stop.stop_name)
 print(list(dict_stop_segments.values())[2].number_of_trips, list(dict_stop_segments.values())[2].from_stop.stop_name, list(dict_stop_segments.values())[2].to_stop.stop_name)
