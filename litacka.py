@@ -3,15 +3,15 @@ from datetime import time
 from ntpath import join
 import os
 
-# download_data = input("Chcete stáhnout a rozbalit data? (ano/ne) ")
+download_data = input("Chcete stáhnout a rozbalit data? (ano/ne) ")
 
-# if download_data == "ano":
-#     import get_data
-#     get_data.retrieve_data()
-# elif download_data == "ne":
-#     pass
-# else:
-#     print("Chybná odpověď.", input("Zkuste to znovu! (ano/ne) "))
+if download_data == "ano":
+    import get_data
+    get_data.retrieve_data()
+elif download_data == "ne":
+    pass
+else:
+    print("Chybná odpověď.", input("Zkuste to znovu! (ano/ne) "))
 
 class GTFSTable():
     def __init__(self) -> None:
@@ -203,8 +203,8 @@ dict_stop_segments = StopSegment.create_segments(list_stop_times)
 segments_sorted = sorted(dict_stop_segments.values(), key= lambda x: x.number_of_trips, reverse= True)
 
 print("Nejfrekventovanější mezizastávkové úseky:")
-print(f"1: {segments_sorted[0].from_stop.stop_name} - {segments_sorted[0].to_stop.stop_name}, počet spojů: {segments_sorted[0].number_of_trips}, linky: {' '.join(sorted(segments_sorted[0].routes))}")
-print(f"2: {segments_sorted[1].from_stop.stop_name} - {segments_sorted[1].to_stop.stop_name}, počet spojů: {segments_sorted[1].number_of_trips}, linky: {' '.join(sorted(segments_sorted[1].routes))}")
-print(f"3: {segments_sorted[2].from_stop.stop_name} - {segments_sorted[2].to_stop.stop_name}, počet spojů: {segments_sorted[2].number_of_trips}, linky: {' '.join(sorted(segments_sorted[2].routes))}")
-print(f"4: {segments_sorted[3].from_stop.stop_name} - {segments_sorted[3].to_stop.stop_name}, počet spojů: {segments_sorted[3].number_of_trips}, linky: {' '.join(sorted(segments_sorted[3].routes))}")
-print(f"5: {segments_sorted[4].from_stop.stop_name} - {segments_sorted[4].to_stop.stop_name}, počet spojů: {segments_sorted[4].number_of_trips}, linky: {' '.join(sorted(segments_sorted[4].routes))}")
+print(f"1: {segments_sorted[0].from_stop.stop_name} - {segments_sorted[0].to_stop.stop_name}, počet spojů: {segments_sorted[0].number_of_trips}, linky: {' '.join(sorted(segments_sorted[0].routes, key = int))}")
+print(f"2: {segments_sorted[1].from_stop.stop_name} - {segments_sorted[1].to_stop.stop_name}, počet spojů: {segments_sorted[1].number_of_trips}, linky: {' '.join(sorted(segments_sorted[1].routes, key = int))}")
+print(f"3: {segments_sorted[2].from_stop.stop_name} - {segments_sorted[2].to_stop.stop_name}, počet spojů: {segments_sorted[2].number_of_trips}, linky: {' '.join(sorted(segments_sorted[2].routes, key = int))}")
+print(f"4: {segments_sorted[3].from_stop.stop_name} - {segments_sorted[3].to_stop.stop_name}, počet spojů: {segments_sorted[3].number_of_trips}, linky: {' '.join(sorted(segments_sorted[3].routes, key = int))}")
+print(f"5: {segments_sorted[4].from_stop.stop_name} - {segments_sorted[4].to_stop.stop_name}, počet spojů: {segments_sorted[4].number_of_trips}, linky: {' '.join(sorted(segments_sorted[4].routes, key = int))}")
