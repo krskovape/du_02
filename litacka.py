@@ -1,16 +1,17 @@
 import csv
 from datetime import time
-from os import stat
+from ntpath import join
+import os
 
-download_data = input("Do you want to download and unzip data? (yes/no) ")
+# download_data = input("Chcete stáhnout a rozbalit data? (ano/ne) ")
 
-if download_data == "yes":
-    import get_data
-    get_data.retrieve_data()
-elif download_data == "no":
-    pass
-else:
-    print("Wrong answear.", input("Try again! (yes/no) "))
+# if download_data == "ano":
+#     import get_data
+#     get_data.retrieve_data()
+# elif download_data == "ne":
+#     pass
+# else:
+#     print("Chybná odpověď.", input("Zkuste to znovu! (ano/ne) "))
 
 class GTFSTable():
     def __init__(self) -> None:
@@ -20,22 +21,22 @@ class GTFSTable():
         try:
             with open(file_name, encoding="utf-8", newline = '') as csvfile:
                 #empty file
-                if stat(file_name).st_size == 0:
-                    print("File is empty.")
+                if os.stat(file_name).st_size == 0:
+                    print("Složka je prázdná.")
                     quit()
                 
-                a = csv.DictReader(csvfile, delimiter = ',')
+                dict_reader = csv.DictReader(csvfile, delimiter = ',')
 
-                list = []
-                for feature in a:
-                    list.append(feature)
-                return list
+                alist = []
+                for feature in dict_reader:
+                    alist.append(feature)
+                return alist
 
         except FileNotFoundError:
-            print(f"Cannot open file {file_name}. The file does not exist or the path to the file is incorrect")
+            print(f"Nelze otevřít soubor {file_name}. Soubor neexistuje nebo je k němu zadána nekorektní cesta")
             quit()
         except PermissionError:
-            print(f"Program doesn't have permisson to access file {file_name}.")
+            print(f"Program nemá povolen přístup k souboru {file_name}.")
             quit()
 
 class Stop(GTFSTable):
@@ -55,14 +56,14 @@ class Stop(GTFSTable):
         self.asw_stop_id : int = data["asw_stop_id"]
 
     @classmethod
-    def add_element(cls, file_name):
-        list = cls.load_file(cls, file_name)
+    def elements_from_file(cls, file_name):
+        alist = cls.load_file(cls, file_name)
         dict_stops = {}
         list_stop = []
-        for b in list:
-            a = cls(b)
-            dict_stops[b["stop_id"]] = a
-            list_stop.append(a)
+        for item in alist:
+            stop_object = cls(item)
+            dict_stops[item["stop_id"]] = stop_object
+            list_stop.append(stop_object)
         return list_stop, dict_stops
 
 
@@ -81,12 +82,12 @@ class StopTime(GTFSTable):
         self.bikes_allowed : int = data["bikes_allowed"]
     
     @classmethod
-    def add_element(cls, file_name, dict_trips, dict_stops):
-        list = cls.load_file(cls, file_name)
+    def elements_from_file(cls, file_name, dict_trips, dict_stops):
+        alist = cls.load_file(cls, file_name)
         list_stop_times = []
-        for b in list:
-            a = cls(b, dict_trips, dict_stops)
-            list_stop_times.append(a)
+        for item in alist:
+            stop_time_object = cls(item, dict_trips, dict_stops)
+            list_stop_times.append(stop_time_object)
         return list_stop_times
 
 
@@ -105,14 +106,14 @@ class Trip(GTFSTable):
         self.exceptional : int = data["exceptional"]
     
     @classmethod
-    def add_element(cls, file_name, dict_routes):
-        list = cls.load_file(cls, file_name)
+    def elements_from_file(cls, file_name, dict_routes):
+        alist = cls.load_file(cls, file_name)
         dict_trips = {}
         list_trips = []
-        for b in list:
-            a = cls(b, dict_routes)
-            dict_trips[b["trip_id"]] = a
-            list_trips.append(a)
+        for item in alist:
+            trip_object = cls(item, dict_routes)
+            dict_trips[item["trip_id"]] = trip_object
+            list_trips.append(trip_object)
         return list_trips, dict_trips
     
 
@@ -131,14 +132,14 @@ class Route(GTFSTable):
         self.is_substitute_transport : int = data["is_substitute_transport"]
     
     @classmethod
-    def add_element(cls, file_name):
-        list = cls.load_file(cls, file_name)
+    def elements_from_file(cls, file_name):
+        alist = cls.load_file(cls, file_name)
         dict_routes = {}
         list_routes = []
-        for b in list:
-            a = cls(b)
-            dict_routes[b["route_id"]] = a
-            list_routes.append(a)
+        for item in alist:
+            route_object = cls(item)
+            dict_routes[item["route_id"]] = route_object
+            list_routes.append(route_object)
         return list_routes, dict_routes
     
     
@@ -150,53 +151,55 @@ class StopSegment(GTFSTable):
         self.trips : list = [trip]
         self.number_of_trips = 1
         self.routes : list = [route_short_name]
+    
+    @classmethod
+    def create_segments(cls, list_stop_times):
+        dict_stop_segments = {}
 
-print("Počet objektů:")
-stop_file = "gtfs\\stops.txt"
-list_stops, dict_stops = Stop.add_element(stop_file)
-#print(list_stops)
-print(f"Stops: {len(list_stops)}")
+        i = 0
+        j = 1
 
-routes_file = "gtfs\\routes.txt"
-list_routes, dict_routes = Route.add_element(routes_file)
-#print(list_routes)
-print(f"Routes: {len(list_routes)}")
+        while j <= len(list_stop_times)-1:
+            st_from = list_stop_times[i]
+            st_to = list_stop_times[j]
+            if st_from.trip == st_to.trip\
+                and st_from.stop_sequence < st_to.stop_sequence:
 
-trips_file = "gtfs\\trips.txt"
-list_trips, dict_trips = Trip.add_element(trips_file, dict_routes)
-#print(list_trips)
-print(f"Trips: {len(list_trips)}")
+                if (str(st_from.stop.stop_id)+str(st_to.stop.stop_id)) in dict_stop_segments:
+                    dict_stop_segments[str(st_from.stop.stop_id)+str(st_to.stop.stop_id)].trips.append(st_from.trip)
+                    dict_stop_segments[str(st_from.stop.stop_id)+str(st_to.stop.stop_id)].number_of_trips += 1
+                    if st_from.trip.route.route_short_name not in dict_stop_segments[str(st_from.stop.stop_id)+str(st_to.stop.stop_id)].routes:
+                        dict_stop_segments[str(st_from.stop.stop_id)+str(st_to.stop.stop_id)].routes.append(st_from.trip.route.route_short_name)
 
-stop_times_file = "gtfs\\stop_times.txt"
-list_stop_times= StopTime.add_element(stop_times_file, dict_trips, dict_stops)
-#print(list_stop_times)
-print(f"StopTimes: {len(list_stop_times)}")
+                else:
+                    dict_stop_segments[str(st_from.stop.stop_id)+str(st_to.stop.stop_id)] = \
+                        cls(st_from.stop, st_to.stop, st_from.trip, st_from.trip.route.route_short_name)
+            i += 1
+            j += 1
+        
+        return dict_stop_segments
+        
 
-#stop_segment = StopSegment()
-#list_stop_segments = []
-dict_stop_segments = {}
+#print("Počet objektů:")
+stop_file = os.path.join("gtfs", "stops.txt")
+list_stops, dict_stops = Stop.elements_from_file(stop_file)
+#print(f"Stops: {len(list_stops)}")
 
-i = 0
-j = 1
+routes_file = os.path.join("gtfs", "routes.txt")
+list_routes, dict_routes = Route.elements_from_file(routes_file)
+#print(f"Routes: {len(list_routes)}")
 
-while j <= len(list_stop_times)-1:
-    if list_stop_times[i].trip == list_stop_times[j].trip\
-        and list_stop_times[i].stop_sequence < list_stop_times[j].stop_sequence:
+trips_file = os.path.join("gtfs", "trips.txt")
+list_trips, dict_trips = Trip.elements_from_file(trips_file, dict_routes)
+#print(f"Trips: {len(list_trips)}")
 
-        if (str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)) in dict_stop_segments:
-            dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].trips.append(list_stop_times[i].trip)
-            dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].number_of_trips += 1
-            if list_stop_times[i].trip.route.route_short_name not in dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].routes:
-                dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)].routes.append(list_stop_times[i].trip.route.route_short_name)
-
-        else:
-            dict_stop_segments[str(list_stop_times[i].stop.stop_id)+str(list_stop_times[j].stop.stop_id)] = \
-                StopSegment(list_stop_times[i].stop, list_stop_times[j].stop, list_stop_times[i].trip, list_stop_times[i].trip.route.route_short_name)
-    i += 1
-    j += 1
+stop_times_file = os.path.join("gtfs", "stop_times.txt")
+list_stop_times= StopTime.elements_from_file(stop_times_file, dict_trips, dict_stops)
+#print(f"StopTimes: {len(list_stop_times)}")
 
 print("\n")
 
+dict_stop_segments = StopSegment.create_segments(list_stop_times)
 segments_sorted = sorted(dict_stop_segments.values(), key= lambda x: x.number_of_trips, reverse= True)
 
 print("Nejfrekventovanější mezizastávkové úseky:")

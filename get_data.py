@@ -2,11 +2,9 @@
 from urllib.error import HTTPError
 import requests, zipfile, io
 
-from urllib3 import Timeout
-
 def retrieve_data():
     try:
-        print("Stahuju data.")
+        print("Stahuji data.")
         r = requests.get("http://data.pid.cz/PID_GTFS.zip")
         z = zipfile.ZipFile(io.BytesIO(r.content))
         z.extractall("gtfs")
