@@ -165,14 +165,14 @@ class StopSegment(GTFSTable):
             if st_from.trip == st_to.trip\
                 and st_from.stop_sequence < st_to.stop_sequence:
 
-                if (str(st_from.stop.stop_id)+str(st_to.stop.stop_id)) in dict_stop_segments:
-                    dict_stop_segments[str(st_from.stop.stop_id)+str(st_to.stop.stop_id)].trips.append(st_from.trip)
-                    dict_stop_segments[str(st_from.stop.stop_id)+str(st_to.stop.stop_id)].number_of_trips += 1
-                    if st_from.trip.route.route_short_name not in dict_stop_segments[str(st_from.stop.stop_id)+str(st_to.stop.stop_id)].routes:
-                        dict_stop_segments[str(st_from.stop.stop_id)+str(st_to.stop.stop_id)].routes.append(st_from.trip.route.route_short_name)
+                if ((st_from.stop.stop_id),(st_to.stop.stop_id)) in dict_stop_segments:
+                    dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))].trips.append(st_from.trip)
+                    dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))].number_of_trips += 1
+                    if st_from.trip.route.route_short_name not in dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))].routes:
+                        dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))].routes.append(st_from.trip.route.route_short_name)
 
                 else:
-                    dict_stop_segments[str(st_from.stop.stop_id)+str(st_to.stop.stop_id)] = \
+                    dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))] = \
                         cls(st_from.stop, st_to.stop, st_from.trip, st_from.trip.route.route_short_name)
             i += 1
             j += 1
