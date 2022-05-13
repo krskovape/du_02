@@ -2,16 +2,33 @@ import csv
 from datetime import time
 from ntpath import join
 import os
+from turtle import down
 
-download_data = input("Chcete stáhnout a rozbalit data? (ano/ne) ")
+# download_data = input("Chcete stáhnout a rozbalit data? (ano/ne) ")
 
-if download_data == "ano":
-    import get_data
-    get_data.retrieve_data()
-elif download_data == "ne":
-    pass
-else:
-    print("Chybná odpověď.", input("Zkuste to znovu! (ano/ne) "))
+# if download_data == "ano":
+#     import get_data
+#     get_data.retrieve_data()
+# elif download_data == "ne":
+#     pass
+# else:
+#     print("Chybná odpověď.", input("Zkuste to znovu! (ano/ne) "))
+#     # print("Chybná odpověď. Program skončí.")
+#     # quit()
+
+download_data = None
+
+while download_data not in ("ano", "ne"): 
+    download_data = input("Chcete stáhnout a rozbalit data? (ano/ne) ")
+    if download_data == "ne": 
+        print("Program se spustí na Vašich datech. Pokud neexistují, skončí.")
+        continue
+    if download_data == "ano":
+        import get_data
+        get_data.retrieve_data()
+    else: 
+        print("Chybná odpověď. Zkuste to znovu!") 
+
 
 class GTFSTable():
     def __init__(self) -> None:
@@ -156,11 +173,11 @@ class StopSegment(GTFSTable):
     def create_segments(cls, list_stop_times):
         dict_stop_segments = {}
 
-        i = 0
         j = 1
 
-        while j <= len(list_stop_times)-1:
-            st_from = list_stop_times[i]
+        #while j <= len(list_stop_times)-1:
+        for j in range(len(list_stop_times)-1):
+            st_from = list_stop_times[j-1]
             st_to = list_stop_times[j]
             if st_from.trip == st_to.trip\
                 and st_from.stop_sequence < st_to.stop_sequence:
@@ -174,7 +191,6 @@ class StopSegment(GTFSTable):
                 else:
                     dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))] = \
                         cls(st_from.stop, st_to.stop, st_from.trip, st_from.trip.route.route_short_name)
-            i += 1
             j += 1
         
         return dict_stop_segments
