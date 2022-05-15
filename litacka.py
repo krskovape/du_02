@@ -34,7 +34,8 @@ class GTFSTable():
     def __init__(self) -> None:
         pass
 
-    def load_file(self, file_name):
+    @classmethod
+    def load_file(cls, file_name):
         try:
             with open(file_name, encoding="utf-8", newline = '') as csvfile:
                 #empty file
@@ -74,7 +75,7 @@ class Stop(GTFSTable):
 
     @classmethod
     def elements_from_file(cls, file_name):
-        alist = cls.load_file(cls, file_name)
+        alist = cls.load_file(file_name)
         dict_stops = {}
         list_stop = []
         for item in alist:
@@ -100,7 +101,7 @@ class StopTime(GTFSTable):
     
     @classmethod
     def elements_from_file(cls, file_name, dict_trips, dict_stops):
-        alist = cls.load_file(cls, file_name)
+        alist = cls.load_file(file_name)
         list_stop_times = []
         for item in alist:
             stop_time_object = cls(item, dict_trips, dict_stops)
@@ -124,7 +125,7 @@ class Trip(GTFSTable):
     
     @classmethod
     def elements_from_file(cls, file_name, dict_routes):
-        alist = cls.load_file(cls, file_name)
+        alist = cls.load_file(file_name)
         dict_trips = {}
         list_trips = []
         for item in alist:
@@ -150,7 +151,7 @@ class Route(GTFSTable):
     
     @classmethod
     def elements_from_file(cls, file_name):
-        alist = cls.load_file(cls, file_name)
+        alist = cls.load_file(file_name)
         dict_routes = {}
         list_routes = []
         for item in alist:
