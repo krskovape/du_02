@@ -2,7 +2,6 @@ import csv
 from datetime import time
 from ntpath import join
 import os
-from turtle import down
 
 # download_data = input("Chcete stáhnout a rozbalit data? (ano/ne) ")
 
@@ -176,19 +175,23 @@ class StopSegment(GTFSTable):
 
         for i in range(len(list_stop_times)-1):
             st_from = list_stop_times[i]
+            st_from_id = st_from.stop.stop_id
             st_to = list_stop_times[i+1]
+            st_to_id = st_to.stop.stop_id
+            route_name = st_from.trip.route.route_short_name
+
             if st_from.trip == st_to.trip\
                 and st_from.stop_sequence < st_to.stop_sequence:
 
-                if ((st_from.stop.stop_id),(st_to.stop.stop_id)) in dict_stop_segments:
-                    dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))].trips.append(st_from.trip)
-                    dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))].number_of_trips += 1
-                    if st_from.trip.route.route_short_name not in dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))].routes:
-                        dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))].routes.append(st_from.trip.route.route_short_name)
+                if ((st_from_id),(st_to_id)) in dict_stop_segments:
+                    dict_stop_segments[((st_from_id),(st_to_id))].trips.append(st_from.trip)
+                    dict_stop_segments[((st_from_id),(st_to_id))].number_of_trips += 1
+                    if route_name not in dict_stop_segments[((st_from_id),(st_to_id))].routes:
+                        dict_stop_segments[((st_from_id),(st_to_id))].routes.append(route_name)
 
                 else:
-                    dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))] = \
-                        cls(st_from.stop, st_to.stop, st_from.trip, st_from.trip.route.route_short_name)
+                    dict_stop_segments[((st_from_id),(st_to_id))] = \
+                        cls(st_from.stop, st_to.stop, st_from.trip, route_name)
         
         return dict_stop_segments
         
