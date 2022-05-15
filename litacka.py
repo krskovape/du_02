@@ -39,7 +39,7 @@ class GTFSTable():
             with open(file_name, encoding="utf-8", newline = '') as csvfile:
                 #empty file
                 if os.stat(file_name).st_size == 0:
-                    print("Složka je prázdná.")
+                    print("Soubor je prázdný.")
                     quit()
                 
                 dict_reader = csv.DictReader(csvfile, delimiter = ',')
@@ -173,12 +173,9 @@ class StopSegment(GTFSTable):
     def create_segments(cls, list_stop_times):
         dict_stop_segments = {}
 
-        j = 1
-
-        #while j <= len(list_stop_times)-1:
-        for j in range(len(list_stop_times)-1):
-            st_from = list_stop_times[j-1]
-            st_to = list_stop_times[j]
+        for i in range(len(list_stop_times)-1):
+            st_from = list_stop_times[i]
+            st_to = list_stop_times[i+1]
             if st_from.trip == st_to.trip\
                 and st_from.stop_sequence < st_to.stop_sequence:
 
@@ -191,7 +188,6 @@ class StopSegment(GTFSTable):
                 else:
                     dict_stop_segments[((st_from.stop.stop_id),(st_to.stop.stop_id))] = \
                         cls(st_from.stop, st_to.stop, st_from.trip, st_from.trip.route.route_short_name)
-            j += 1
         
         return dict_stop_segments
         
