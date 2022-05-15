@@ -3,6 +3,7 @@ from datetime import time
 from ntpath import join
 import os
 
+#download data or use the existing ones
 download_data = None
 
 while download_data not in ("ano", "ne"): 
@@ -20,7 +21,8 @@ while download_data not in ("ano", "ne"):
 class GTFSTable():
     def __init__(self) -> None:
         pass
-
+    
+    #method for opening file, returns list of objects
     @classmethod
     def load_file(cls, file_name):
         try:
@@ -44,6 +46,7 @@ class GTFSTable():
             print(f"Program nemá povolen přístup k souboru {file_name}.")
             quit()
 
+#class for Stop objects
 class Stop(GTFSTable):
     def __init__(self, data):
         self.stop_id : str = data["stop_id"]
@@ -60,6 +63,7 @@ class Stop(GTFSTable):
         self.asw_node_id : int = data["asw_node_id"]
         self.asw_stop_id : int = data["asw_stop_id"]
 
+    #method for creating elements, returns list of elements and dictionary for connecting classes
     @classmethod
     def elements_from_file(cls, file_name):
         alist = cls.load_file(file_name)
@@ -71,7 +75,7 @@ class Stop(GTFSTable):
             list_stop.append(stop_object)
         return list_stop, dict_stops
 
-
+#class for StopTime objects
 class StopTime(GTFSTable):
     def __init__(self, data, dict_trips : dict, dict_stops : dict):
         self.trip : Trip = dict_trips.get(data["trip_id"])
@@ -85,7 +89,8 @@ class StopTime(GTFSTable):
         self.shape_dist_traveled : float = data["shape_dist_traveled"]
         self.trip_operation_type : int = data["trip_operation_type"]
         self.bikes_allowed : int = data["bikes_allowed"]
-    
+
+    #method for creating elements, returns list of elements and dictionary for connecting classes    
     @classmethod
     def elements_from_file(cls, file_name, dict_trips, dict_stops):
         alist = cls.load_file(file_name)
@@ -95,7 +100,7 @@ class StopTime(GTFSTable):
             list_stop_times.append(stop_time_object)
         return list_stop_times
 
-
+#class for Trip objects
 class Trip(GTFSTable):
     def __init__(self, data, dict_routes : dict):
         self.route : Route = dict_routes.get(data["route_id"])
@@ -109,7 +114,8 @@ class Trip(GTFSTable):
         self.wheelchair_accessible : int = data["wheelchair_accessible"]
         self.bikes_allowed : int = data["bikes_allowed"]
         self.exceptional : int = data["exceptional"]
-    
+
+    #method for creating elements, returns list of elements and dictionary for connecting classes    
     @classmethod
     def elements_from_file(cls, file_name, dict_routes):
         alist = cls.load_file(file_name)
@@ -121,7 +127,7 @@ class Trip(GTFSTable):
             list_trips.append(trip_object)
         return list_trips, dict_trips
     
-
+#class for Route objects
 class Route(GTFSTable):
     def __init__(self, data):
         self.route_id : str = data["route_id"]
@@ -135,7 +141,8 @@ class Route(GTFSTable):
         self.is_night : int = data["is_night"]
         self.is_regional : int = data["is_regional"]
         self.is_substitute_transport : int = data["is_substitute_transport"]
-    
+
+    #method for creating elements, returns list of elements and dictionary for connecting classes    
     @classmethod
     def elements_from_file(cls, file_name):
         alist = cls.load_file(file_name)
@@ -147,8 +154,7 @@ class Route(GTFSTable):
             list_routes.append(route_object)
         return list_routes, dict_routes
     
-    
-
+#class for StopSegment objects
 class StopSegment(GTFSTable):
     def __init__ (self, from_stop, to_stop, trip, route_short_name):
         self.from_stop = from_stop
@@ -156,34 +162,40 @@ class StopSegment(GTFSTable):
         self.trips : list = [trip]
         self.number_of_trips = 1
         self.routes : list = [route_short_name]
-    
+
+    #method for creating segments    
     @classmethod
     def create_segments(cls, list_stop_times):
         dict_stop_segments = {}
 
+        #iterate through list of StopTime objects
         for i in range(len(list_stop_times)-1):
+            #initialization of properties
             st_from = list_stop_times[i]
             st_from_id = st_from.stop.stop_id
             st_to = list_stop_times[i+1]
             st_to_id = st_to.stop.stop_id
             route_name = st_from.trip.route.route_short_name
 
+            #check if the stops are part of the same trip and check the sequence numbers
             if st_from.trip == st_to.trip\
                 and st_from.stop_sequence < st_to.stop_sequence:
 
+                #if segment exists, update its attributes
                 if ((st_from_id),(st_to_id)) in dict_stop_segments:
                     dict_stop_segments[((st_from_id),(st_to_id))].trips.append(st_from.trip)
                     dict_stop_segments[((st_from_id),(st_to_id))].number_of_trips += 1
                     if route_name not in dict_stop_segments[((st_from_id),(st_to_id))].routes:
                         dict_stop_segments[((st_from_id),(st_to_id))].routes.append(route_name)
 
+                #else create a new segment
                 else:
                     dict_stop_segments[((st_from_id),(st_to_id))] = \
                         cls(st_from.stop, st_to.stop, st_from.trip, route_name)
         
         return dict_stop_segments
         
-
+#creating elements from data in txt files
 #print("Počet objektů:")
 stop_file = os.path.join("gtfs", "stops.txt")
 list_stops, dict_stops = Stop.elements_from_file(stop_file)
@@ -203,9 +215,11 @@ list_stop_times= StopTime.elements_from_file(stop_times_file, dict_trips, dict_s
 
 print("\n")
 
+#create dictionary of StopSegment elements and than sort it descending by number of trips
 dict_stop_segments = StopSegment.create_segments(list_stop_times)
 segments_sorted = sorted(dict_stop_segments.values(), key= lambda x: x.number_of_trips, reverse= True)
 
+#print first five elements from sorted dictionary
 print("Nejfrekventovanější mezizastávkové úseky:")
 print(f"1: {segments_sorted[0].from_stop.stop_name} - {segments_sorted[0].to_stop.stop_name}, počet spojů: {segments_sorted[0].number_of_trips}, linky: {' '.join(sorted(segments_sorted[0].routes, key = int))}")
 print(f"2: {segments_sorted[1].from_stop.stop_name} - {segments_sorted[1].to_stop.stop_name}, počet spojů: {segments_sorted[1].number_of_trips}, linky: {' '.join(sorted(segments_sorted[1].routes, key = int))}")
