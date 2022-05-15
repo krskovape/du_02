@@ -3,18 +3,6 @@ from datetime import time
 from ntpath import join
 import os
 
-# download_data = input("Chcete stáhnout a rozbalit data? (ano/ne) ")
-
-# if download_data == "ano":
-#     import get_data
-#     get_data.retrieve_data()
-# elif download_data == "ne":
-#     pass
-# else:
-#     print("Chybná odpověď.", input("Zkuste to znovu! (ano/ne) "))
-#     # print("Chybná odpověď. Program skončí.")
-#     # quit()
-
 download_data = None
 
 while download_data not in ("ano", "ne"): 
