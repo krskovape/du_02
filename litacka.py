@@ -68,12 +68,12 @@ class Stop(GTFSTable):
     def elements_from_file(cls, file_name):
         alist = cls.load_file(file_name)
         dict_stops = {}
-        list_stop = []
+        list_stops = []
         for item in alist:
             stop_object = cls(item)
             dict_stops[item["stop_id"]] = stop_object
-            list_stop.append(stop_object)
-        return list_stop, dict_stops
+            list_stops.append(stop_object)
+        return list_stops, dict_stops
 
 #class for StopTime objects
 class StopTime(GTFSTable):
