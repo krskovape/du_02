@@ -161,7 +161,7 @@ class StopSegment(GTFSTable):
         self.to_stop = to_stop
         self.trips : list = [trip]
         self.number_of_trips = 1
-        self.routes : list = [route_short_name]
+        self.routes : set = set(route_short_name)
 
     #method for creating segments    
     @classmethod
@@ -185,8 +185,7 @@ class StopSegment(GTFSTable):
                 if ((st_from_id),(st_to_id)) in dict_stop_segments:
                     dict_stop_segments[((st_from_id),(st_to_id))].trips.append(st_from.trip)
                     dict_stop_segments[((st_from_id),(st_to_id))].number_of_trips += 1
-                    if route_name not in dict_stop_segments[((st_from_id),(st_to_id))].routes:
-                        dict_stop_segments[((st_from_id),(st_to_id))].routes.append(route_name)
+                    dict_stop_segments[((st_from_id),(st_to_id))].routes.add(route_name)
 
                 #else create a new segment
                 else:
